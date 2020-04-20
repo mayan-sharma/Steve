@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-// const mongoURI = todo;
+const mongoURI = 'mongodb+srv://ritika:ritika@cluster0-uohi0.mongodb.net/test?retryWrites=true&w=majority';
 
 const connectDb = async ()=>{
     try{

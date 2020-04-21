@@ -2,7 +2,7 @@ const { Product, validateProduct } = require("../../models/product");
 const errorHandler = require("../../middleware/error");
 const express = require("express");
 
-const router = express.router();
+const router = express.Router();
 
 router.get("/", async (req, res) => {
   try {

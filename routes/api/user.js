@@ -1,4 +1,5 @@
 const User = require("../../models/user");
+const Cart = require("../../models/cart");
 const jwt = require("jsonwebtoken");
 const express = require("express");
 const router = express.Router();
@@ -41,6 +42,7 @@ router.post("/register", async (req, res) => {
     }
 
     const newUser = await User.create(req.body);
+    const newUserCart = await Cart.create({user: newUser._id});
 
     const token = jwt.sign({ id: newUser._id }, "secretForNow", {
       expiresIn: "20s",
@@ -50,6 +52,7 @@ router.post("/register", async (req, res) => {
       message: "User created",
       token,
       user: newUser,
+      cart: newUserCart
     });
   } catch (err) {
     console.log(err);

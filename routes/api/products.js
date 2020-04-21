@@ -1,48 +1,64 @@
-const { Product, validateProduct } = require("../models/product");
+const { Product, validateProduct } = require("../../models/product");
+const errorHandler = require("../../middleware/error");
 const express = require("express");
 
 const router = express.router();
 
 router.get("/", async (req, res) => {
-  const products = await Product.find().sort("name");
-  res.json(products);
+  try {
+    const products = await Product.find().sort("name");
+    res.json(products);
+  } catch (err) {
+    errorHandler(err);
+  }
 });
 
 router.post("/", async (req, res) => {
-  const { error } = validateProduct(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  try {
+    const { error } = validateProduct(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
 
-  const product = new Product({
-    name: req.body.name,
-    price: req.body.price,
-  });
+    const product = new Product({
+      name: req.body.name,
+      price: req.body.price,
+    });
 
-  await product.save();
-  res.json(product);
+    await product.save();
+    res.json(product);
+  } catch (err) {
+    errorHandler(err);
+  }
 });
 
 router.put("/:id", async (req, res) => {
-  const { error } = validateProduct(req.body);
-  if (error) return res.status(400).send(error.details[0].message);
+  try {
+    const { error } = validateProduct(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
 
-  const product = await Product.findByIdAndUpdate(
-    req.params.id,
-    {
-      name: req.body.name,
-      price: req.body.price,
-    },
-    { new: true }
-  );
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
+        name: req.body.name,
+        price: req.body.price,
+      },
+      { new: true }
+    );
 
-  if (!product) return res.status(400).send("Product not found!");
-  res.json(product);
+    if (!product) return res.status(400).send("Product not found!");
+    res.json(product);
+  } catch (err) {
+    errorHandler(err);
+  }
 });
 
 router.delete("/:id", async (req, res) => {
-  const product = await Product.findByIdAndRemove(req.params.id);
-  if (!product) return res.status(404).send("Product not found!");
-
-  res.json(product);
+  try {
+    const product = await Product.findByIdAndRemove(req.params.id);
+    if (!product) return res.status(404).send("Product not found!");
+    res.json(product);
+  } catch (err) {
+    errorHandler(err);
+  }
 });
 
 module.exports = router;

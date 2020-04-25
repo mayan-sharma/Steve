@@ -41,12 +41,11 @@ router.post("/register", async (req, res) => {
     }
 
     // hashing password
-    const newUser = new User(req.body);
+    const newUser = await User.create(req.body);
     const salt = await bcrypt.genSalt(10);
-    newUser.password = await bcrypt.hash(newUser.passord, salt);
+    newUser.password = await bcrypt.hash(newUser.password, salt);
     await newUser.save();
 
-    // const newUser = await User.create(req.body);
     const newUserCart = await Cart.create({ user: newUser._id });
 
     const token = jwt.sign({ id: newUser._id }, "secretForNow", {

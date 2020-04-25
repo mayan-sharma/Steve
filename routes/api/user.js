@@ -2,6 +2,8 @@ const User = require("../../models/user");
 const Cart = require("../../models/cart");
 const jwt = require("jsonwebtoken");
 const express = require("express");
+const bcrypt = require("bcrypt");
+const asyncHandler = require("../../middleware/error");
 const router = express.Router();
 
 // route: api/user/login
@@ -24,10 +26,7 @@ router.post("/login", async (req, res) => {
       user,
     });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      message: "Internal server error",
-    });
+    asyncHandler(err);
   }
 });
 
@@ -41,8 +40,14 @@ router.post("/register", async (req, res) => {
       });
     }
 
-    const newUser = await User.create(req.body);
-    const newUserCart = await Cart.create({user: newUser._id});
+    // hashing password
+    const newUser = new User(req.body);
+    const salt = await bcrypt.genSalt(10);
+    newUser.password = await bcrypt.hash(newUser.passord, salt);
+    await newUser.save();
+
+    // const newUser = await User.create(req.body);
+    const newUserCart = await Cart.create({ user: newUser._id });
 
     const token = jwt.sign({ id: newUser._id }, "secretForNow", {
       expiresIn: "20s",
@@ -52,13 +57,10 @@ router.post("/register", async (req, res) => {
       message: "User created",
       token,
       user: newUser,
-      cart: newUserCart
+      cart: newUserCart,
     });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      message: "Internal server error",
-    });
+    asyncHandler(err);
   }
 });
 
@@ -71,10 +73,7 @@ router.get("/", async (req, res) => {
       users,
     });
   } catch (err) {
-    console.log(err);
-    return res.status(500).json({
-      message: "Internal server error",
-    });
+    asyncHandler(err);
   }
 });
 module.exports = router;

@@ -5,22 +5,37 @@ const express = require("express");
 const bcrypt = require("bcrypt");
 const asyncHandler = require("../../middleware/error");
 const router = express.Router();
+const auth = require("../../middleware/auth");
 
 // route: api/user/login
 router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
-    if (!user || user.password != req.body.password) {
-      return res.status(422).json({
+    if (!user) {
+      return res.status(400).json({
         message: "Invalid username or password",
       });
     }
 
-    const token = jwt.sign({ id: user._id }, "secretForNow", {
-      expiresIn: "20s",
-    });
+    const validPassword = await bcrypt.compare(
+      req.body.password,
+      user.password
+    );
 
-    res.status(200).json({
+    if (!validPassword)
+      return res.status(400).json({
+        message: "Invalid username or password",
+      });
+
+    const token = jwt.sign(
+      { id: user._id, isAdmin: user.isAdmin },
+      "secretForNow",
+      {
+        expiresIn: "3600s",
+      }
+    );
+
+    return res.status(200).json({
       message: "logged in successfully",
       token,
       user,
@@ -41,20 +56,15 @@ router.post("/register", async (req, res) => {
     }
 
     // hashing password
-    const newUser = await User.create(req.body);
+    let newUser = await User.create(req.body);
     const salt = await bcrypt.genSalt(10);
     newUser.password = await bcrypt.hash(newUser.password, salt);
     await newUser.save();
 
     const newUserCart = await Cart.create({ user: newUser._id });
 
-    const token = jwt.sign({ id: newUser._id }, "secretForNow", {
-      expiresIn: "20s",
-    });
-
-    res.status(200).json({
+    return res.status(200).json({
       message: "User created",
-      token,
       user: newUser,
       cart: newUserCart,
     });
@@ -75,4 +85,14 @@ router.get("/", async (req, res) => {
     asyncHandler(err);
   }
 });
+
+// route: api/user/verify
+router.get("/verify", auth, async (req, res) => {
+  try {
+    res.status(200).json({ message: "User verified", user: req.user });
+  } catch (err) {
+    asyncHandler(err);
+  }
+});
+
 module.exports = router;

@@ -1,77 +1,64 @@
-const { Product, validateProduct } = require("../../models/product");
-const errorHandler = require("../../middleware/error");
+const { Product } = require("../../models/product");
+const asyncHandler = require("../../middleware/error");
 const admin = require("../../middleware/admin");
+const auth = require("../../middleware/auth");
 const express = require("express");
-const passport = require("passport");
+// const passport = require("passport");
 const router = express.Router();
 
+// route: /api/products
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find().sort("name");
-    res.json(products);
+    return res.json({ message: "Products", products });
   } catch (err) {
-    errorHandler(err);
+    asyncHandler(err);
   }
 });
 
-router.post(
-  "/",
-  [passport.authenticate("jwt", { session: false }), admin],
-  async (req, res) => {
-    try {
-      const { error } = validateProduct(req.body);
-      if (error) return res.status(400).send(error.details[0].message);
+// route: /api/products
+router.post("/", [auth, admin], async (req, res) => {
+  try {
+    const product = new Product({
+      name: req.body.name,
+      price: req.body.price,
+    });
 
-      const product = new Product({
+    await product.save();
+    return res.json({ message: "Product added", product });
+  } catch (err) {
+    asyncHandler(err);
+  }
+});
+
+// route: /api/products/:id
+router.put("/:id", [auth, admin], async (req, res) => {
+  try {
+    const product = await Product.findByIdAndUpdate(
+      req.params.id,
+      {
         name: req.body.name,
         price: req.body.price,
-      });
+      },
+      { new: true }
+    );
 
-      await product.save();
-      res.json(product);
-    } catch (err) {
-      errorHandler(err);
-    }
+    if (!product) return res.status(400).send("Product not found!");
+    return res.json({ message: "Product updated", product });
+  } catch (err) {
+    asyncHandler(err);
   }
-);
+});
 
-router.put(
-  "/:id",
-  [passport.authenticate("jwt", { session: false }), admin],
-  async (req, res) => {
-    try {
-      const { error } = validateProduct(req.body);
-      if (error) return res.status(400).send(error.details[0].message);
-
-      const product = await Product.findByIdAndUpdate(
-        req.params.id,
-        {
-          name: req.body.name,
-          price: req.body.price,
-        },
-        { new: true }
-      );
-
-      if (!product) return res.status(400).send("Product not found!");
-      res.json(product);
-    } catch (err) {
-      errorHandler(err);
-    }
+// route: /api/products/:id
+router.delete("/:id", [auth, admin], async (req, res) => {
+  try {
+    const product = await Product.findByIdAndRemove(req.params.id);
+    if (!product) return res.status(404).send("Product not found!");
+    return res.json({ message: "Product deleted", product });
+  } catch (err) {
+    asyncHandler(err);
   }
-);
-
-router.delete(
-  "/:id",
-  [passport.authenticate("jwt", { session: false }), admin],
-  async (req, res) => {
-    try {
-      const product = await Product.findByIdAndRemove(req.params.id);
-      if (!product) return res.status(404).send("Product not found!");
-      res.json(product);
-    } catch (err) {
-      errorHandler(err);
-    }
-  }
-);
+});
 
 module.exports = router;

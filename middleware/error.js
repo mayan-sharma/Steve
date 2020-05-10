@@ -1,4 +1,4 @@
-module.export = function asyncHandler(err) {
+module.exports = function asyncHandler(err) {
   console.log(err);
   return res.status(500).json({
     message: "Internal server error",

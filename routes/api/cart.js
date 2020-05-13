@@ -2,7 +2,6 @@ const Cart = require("../../models/cart");
 const { Product } = require("../../models/product");
 const express = require("express");
 const router = express.Router();
-// const passport = require("passport");
 const asyncHandler = require("../../middleware/error");
 const auth = require("../../middleware/auth");
 
@@ -33,8 +32,8 @@ router.get("/display", auth, async (req, res) => {
   }
 });
 
-//route: /api/cart/?product_id=123&cart_id=231  DELETE
-//to remove all instances of that product
+//route: /api/cart/id=123  DELETE
+//to remove one instance of that product
 router.delete("/:id", auth, async (req, res) => {
   const userId = req.user.id;
   try {
@@ -53,4 +52,27 @@ router.delete("/:id", auth, async (req, res) => {
     asyncHandler(err);
   }
 });
+
+// route: api/cart/deleteAll:id=123   DELETE
+//to delete all instances of that product 
+router.delete("/deleteAll/:id",auth, async (req, res)=>{
+  try{
+      let cart = await Cart.findByIdAndUpdate(
+        { user: req.user.id },
+        {
+          $pull: { products: req.params.id },
+        }
+      );
+      let product = await Product.findById(req.params.id);
+      return res.status(200).json({
+          message: "Product deleted",
+          product
+      });
+
+  } catch(err) {
+      asyncHandler(err);
+  }
+})
+
+
 module.exports = router;

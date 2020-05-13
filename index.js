@@ -1,10 +1,6 @@
 const express = require("express");
 const bodyParser = require("body-parser");
-// const path = require("path");
 const connectDb = require("./config/mongoose");
-
-// const passport = require("passport");
-// const passportJwt = require("./config/passport-jwt-strategy");
 
 const app = express();
 
@@ -14,7 +10,6 @@ connectDb();
 //body parser
 app.use(bodyParser.json());
 
-// app.use(passport.initialize());
 
 //use routes
 app.use("/api", require("./routes/api"));

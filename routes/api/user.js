@@ -1,4 +1,4 @@
-const User = require("../../models/user");
+const { User, validateUser } = require("../../models/user");
 const Cart = require("../../models/cart");
 const jwt = require("jsonwebtoken");
 const express = require("express");
@@ -63,10 +63,19 @@ router.post("/register", async (req, res) => {
 
     const newUserCart = await Cart.create({ user: newUser._id });
 
+    const token = await jwt.sign(
+      { id: newUser._id, isAdmin: newUser.isAdmin },
+      "secretForNow",
+      {
+        expiresIn: "3600s",
+      }
+    );
+
     return res.status(200).json({
       message: "User created",
       user: newUser,
       cart: newUserCart,
+      token
     });
   } catch (err) {
     asyncHandler(err);
@@ -95,4 +104,20 @@ router.get("/verify", auth, async (req, res) => {
   }
 });
 
+// route: /api/user/delete
+router.delete("/delete", auth, async(req, res)=>{
+  try{
+    await Cart.findOneAndDelete({
+      user: req.user.id
+    });
+    
+    await User.findByIdAndDelete(req.user.id);
+
+    return res.status(200).json({
+      message: "Account deleted successfully"
+    })
+  } catch(err) {
+    asyncHandler(err);
+  }
+})
 module.exports = router;

@@ -3,7 +3,6 @@ const asyncHandler = require("../../middleware/error");
 const admin = require("../../middleware/admin");
 const auth = require("../../middleware/auth");
 const express = require("express");
-// const passport = require("passport");
 const router = express.Router();
 
 // route: /api/products

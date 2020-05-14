@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const connectDb = require("./config/mongoose");
+const expressValidator = require("express-validator");
 
 const app = express();
 
@@ -10,6 +11,8 @@ connectDb();
 //body parser
 app.use(bodyParser.json());
 
+//use validator
+// app.use(expressValidator);
 
 //use routes
 app.use("/api", require("./routes/api"));

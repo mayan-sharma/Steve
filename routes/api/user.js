@@ -1,4 +1,4 @@
-const { User, validateUser } = require("../../models/user");
+const  User  = require("../../models/user");
 const Cart = require("../../models/cart");
 const jwt = require("jsonwebtoken");
 const express = require("express");
@@ -6,6 +6,8 @@ const bcrypt = require("bcrypt");
 const asyncHandler = require("../../middleware/error");
 const router = express.Router();
 const auth = require("../../middleware/auth");
+const validate = require("../../middleware/validate");
+const {check}  = require('express-validator');
 
 // route: api/user/login
 router.post("/login", async (req, res) => {
@@ -41,12 +43,18 @@ router.post("/login", async (req, res) => {
       user,
     });
   } catch (err) {
-    asyncHandler(err);
+    asyncHandler(res, err);
   }
 });
 
 //route: api/user/register
-router.post("/register", async (req, res) => {
+router.post("/register", validate(
+  [
+    check('name', 'Name must have more than 3 characters').not().isEmpty().escape().isLength({min: 3}),
+    check('email', 'Your email is not valid').not().isEmpty().isEmail().normalizeEmail(),
+    check('password', 'Your password must be at least 5 characters').not().isEmpty().isLength({min: 5}),
+  ]
+),async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (user) {
@@ -78,7 +86,7 @@ router.post("/register", async (req, res) => {
       token
     });
   } catch (err) {
-    asyncHandler(err);
+    asyncHandler(res, err);
   }
 });
 
@@ -91,7 +99,7 @@ router.get("/", async (req, res) => {
       users,
     });
   } catch (err) {
-    asyncHandler(err);
+    asyncHandler(res, err);
   }
 });
 
@@ -100,7 +108,7 @@ router.get("/verify", auth, async (req, res) => {
   try {
     res.status(200).json({ message: "User verified", user: req.user });
   } catch (err) {
-    asyncHandler(err);
+    asyncHandler(res, err);
   }
 });
 
@@ -117,7 +125,7 @@ router.delete("/delete", auth, async(req, res)=>{
       message: "Account deleted successfully"
     })
   } catch(err) {
-    asyncHandler(err);
+    asyncHandler(res, err);
   }
 })
 module.exports = router;

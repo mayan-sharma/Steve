@@ -17,7 +17,7 @@ router.post("/:id", auth, async (req, res) => {
       cart,
     });
   } catch (err) {
-    asyncHandler(err);
+    asyncHandler(res, err);
   }
 });
 
@@ -28,7 +28,7 @@ router.get("/display", auth, async (req, res) => {
     const cart = await Cart.findOne({ user: userId }).populate("products");
     return res.status(200).json({ message: "Products", cart });
   } catch (err) {
-    asyncHandler(err);
+    asyncHandler(res, err);
   }
 });
 
@@ -49,7 +49,7 @@ router.delete("/:id", auth, async (req, res) => {
       product,
     });
   } catch (err) {
-    asyncHandler(err);
+    asyncHandler(res, err);
   }
 });
 
@@ -70,7 +70,7 @@ router.delete("/deleteAll/:id",auth, async (req, res)=>{
       });
 
   } catch(err) {
-      asyncHandler(err);
+      asyncHandler(res, err);
   }
 })
 

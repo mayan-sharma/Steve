@@ -1,12 +1,13 @@
-const Product  = require("../../models/product");
+const Product = require("../../models/product");
 const asyncHandler = require("../../middleware/error");
 const admin = require("../../middleware/admin");
 const auth = require("../../middleware/auth");
 const express = require("express");
 const router = express.Router();
-const validate = require('../../middleware/validate');
-const {check}  = require('express-validator');
+const validate = require("../../middleware/validate");
+const { check } = require("express-validator");
 
+// Get all Products
 // route: /api/products
 router.get("/", async (req, res) => {
   try {
@@ -17,50 +18,78 @@ router.get("/", async (req, res) => {
   }
 });
 
-// route: /api/products
-router.post("/", [auth, admin], validate(
-  [
-    check('name', 'Name must have more than 3 characters').not().isEmpty().escape().isLength({min: 3}),
-    check('price', 'Price must be a decimal value').not().isEmpty().isDecimal()
-  ]
-), async (req, res) => {
+// Get single product
+// route: /api/products/:id
+router.get("/:id", async (req, res) => {
   try {
-    const product = new Product({
-      name: req.body.name,
-      price: req.body.price,
-    });
-
-    await product.save();
-    return res.json({ message: "Product added", product });
+    const product = await Product.findById(req.params.id);
+    return res.json({ message: "Product", product });
   } catch (err) {
     asyncHandler(res, err);
   }
 });
 
-// route: /api/products/:id
-router.put("/:id", [auth, admin], validate(
-  [
-    check('name', 'Name must have more than 3 characters').not().isEmpty().escape().isLength({min: 3}),
-    check('price', 'Price must be a decimal value').not().isEmpty().isDecimal()
-  ]
-), async (req, res) => {
-  try {
-    const product = await Product.findByIdAndUpdate(
-      req.params.id,
-      {
+// POST product
+// route: /api/products
+router.post(
+  "/",
+  [auth, admin],
+  validate([
+    check("name", "Name must have more than 3 characters")
+      .not()
+      .isEmpty()
+      .escape()
+      .isLength({ min: 3 }),
+    check("price", "Price must be a decimal value").not().isEmpty().isDecimal(),
+  ]),
+  async (req, res) => {
+    try {
+      const product = new Product({
         name: req.body.name,
         price: req.body.price,
-      },
-      { new: true }
-    );
+      });
 
-    if (!product) return res.status(400).send("Product not found!");
-    return res.json({ message: "Product updated", product });
-  } catch (err) {
-    asyncHandler(res, err);
+      await product.save();
+      return res.json({ message: "Product added", product });
+    } catch (err) {
+      asyncHandler(res, err);
+    }
   }
-});
+);
 
+// Update Product
+// route: /api/products/:id
+router.put(
+  "/:id",
+  [auth, admin],
+  validate([
+    check("name", "Name must have more than 3 characters")
+      .not()
+      .isEmpty()
+      .escape()
+      .isLength({ min: 3 }),
+    check("price", "Price must be a decimal value").not().isEmpty().isDecimal(),
+  ]),
+  async (req, res) => {
+    try {
+      const product = await Product.findByIdAndUpdate(
+        req.params.id,
+        {
+          name: req.body.name,
+          price: req.body.price,
+        },
+        { new: true }
+      );
+
+      if (!product) return res.status(400).send("Product not found!");
+      return res.json({ message: "Product updated", product });
+    } catch (err) {
+      asyncHandler(res, err);
+    }
+  }
+);
+
+// Delete Product
 // route: /api/products/:id
 router.delete("/:id", [auth, admin], async (req, res) => {
   try {

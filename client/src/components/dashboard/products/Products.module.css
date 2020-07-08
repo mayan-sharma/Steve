@@ -1,0 +1,45 @@
+.container {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.product {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-evenly;
+  height: 320px;
+  border-bottom: 2px solid #000;
+  border-left: 2px solid #000;
+  border-right: 1px solid #000;
+  padding: 1rem;
+  font-family: "Franklin Gothic Medium", "Arial Narrow", Arial, sans-serif;
+}
+
+.product div {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.container img {
+  width: 60%;
+  height: 60%;
+  overflow: hidden;
+}
+
+@media (max-width: 800px) {
+  .container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .product {
+    height: 300px;
+  }
+}
+
+@media (max-width: 420px) {
+  .container {
+    display: block;
+  }
+}

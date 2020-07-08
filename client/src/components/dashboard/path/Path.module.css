@@ -1,0 +1,8 @@
+.container {
+  padding: 0.2rem;
+  border-bottom: 2px solid #000;
+}
+
+.container p {
+  margin-left: 20px;
+}

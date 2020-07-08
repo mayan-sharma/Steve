@@ -10,7 +10,8 @@ import {
   AUTH_ERROR,
 } from "./types";
 
-let URL = "http://localhost:8000/api/user";
+// let URL = "http://localhost:8000/api/user";
+let URL = "/api/user";
 
 // Loads user
 export const loadUser = () => (dispatch, getState) => {

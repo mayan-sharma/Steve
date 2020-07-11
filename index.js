@@ -1,7 +1,9 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+require("dotenv").config();
 const connectDb = require("./config/mongoose");
 const expressValidator = require("express-validator");
+const path = require('path');
 
 const app = express();
 
@@ -14,6 +16,13 @@ app.use(bodyParser.json());
 //use validator
 // app.use(expressValidator);
 
+if(process.env.NODE_ENV === 'production'){
+  app.use(express.static('client/build'));
+  
+  app.get('*', (req, res)=>{
+      res.sendFile(path.resolve(__dirname, 'client', 'build', 'index.html'));
+  });
+}
 //use routes
 app.use("/api", require("./routes/api"));
 

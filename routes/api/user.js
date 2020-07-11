@@ -31,7 +31,7 @@ router.post("/login", async (req, res) => {
 
     const token = jwt.sign(
       { id: user._id, isAdmin: user.isAdmin },
-      "secretForNow",
+      process.env.SECRET.toString(),
       {
         expiresIn: "3600s",
       }
@@ -73,7 +73,7 @@ router.post("/register", validate(
 
     const token = await jwt.sign(
       { id: newUser._id, isAdmin: newUser.isAdmin },
-      "secretForNow",
+      process.env.SECRET.toString(),
       {
         expiresIn: "3600s",
       }

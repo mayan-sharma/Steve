@@ -1,7 +1,5 @@
 const mongoose = require("mongoose");
-const mongoURI =
-  "mongodb://ritika:ritika@cluster0-shard-00-00-uohi0.mongodb.net:27017,cluster0-shard-00-01-uohi0.mongodb.net:27017,cluster0-shard-00-02-uohi0.mongodb.net:27017/test?ssl=true&replicaSet=Cluster0-shard-0&authSource=admin&retryWrites=true&w=majority";
-// "mongodb+srv://ritika:ritika@cluster0-uohi0.mongodb.net/test?retryWrites=true&w=majority";
+const mongoURI = (process.env.MONGO_URI).toString();
 
 const connectDb = async () => {
   try {

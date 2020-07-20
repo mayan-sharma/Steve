@@ -3,7 +3,7 @@ import img from "../../../assets/test.png";
 import styles from "./ProductDetail.module.css";
 import { connect } from "react-redux";
 import { getProduct } from "../../../actions/productAction";
-import { addToCart } from "../../../actions/cartAction";
+import { addToCart, getCart } from "../../../actions/cartAction";
 import Loading from "../../loading/Loading";
 
 class ProductDetail extends React.Component {
@@ -12,21 +12,20 @@ class ProductDetail extends React.Component {
     this.state = {
       name: "",
       price: "",
-      flag: true,
     };
-
     this.addToCartHandler = this.addToCartHandler.bind(this);
   }
 
   componentDidMount() {
     const id = this.props.match.params.id;
     this.props.getProduct(id);
+    // this.props.getCart();
   }
 
   componentDidUpdate() {
-    if (!this.props.isLoading && this.state.flag) {
+    if (!this.props.isLoading && !this.state.name.length) {
       const { name, price } = this.props.product;
-      this.setState({ name: name, price: price, flag: false });
+      this.setState({ name: name, price: price });
     }
   }
 
@@ -34,6 +33,8 @@ class ProductDetail extends React.Component {
     const id = this.props.match.params.id;
     this.props.addToCart(id);
   }
+
+  // productInCart = (product) => this.props.cartProducts.includes(product);
 
   render() {
     return this.props.isLoading ? (
@@ -66,6 +67,9 @@ class ProductDetail extends React.Component {
           {!this.props.isAuthenticated && (
             <p className={styles.disclaimer}>*Login to access cart</p>
           )}
+          {/* {this.productInCart(this.props.product) && (
+            <p className={styles.disclaimer}>* Item already in cart</p>
+          )} */}
         </div>
       </div>
     );
@@ -76,8 +80,9 @@ const mapStateToProps = (state) => ({
   product: state.products.activeProduct,
   isLoading: state.products.isLoading,
   isAuthenticated: state.auth.isAuthenticated,
+  cartProducts: state.cart.products,
 });
 
-export default connect(mapStateToProps, { getProduct, addToCart })(
+export default connect(mapStateToProps, { getProduct, addToCart, getCart })(
   ProductDetail
 );

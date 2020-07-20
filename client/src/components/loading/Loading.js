@@ -4,6 +4,9 @@ import { AiOutlineSync } from "react-icons/ai";
 const Loading = () => {
   const style = {
     fontSize: "4rem",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   };
 
   return (

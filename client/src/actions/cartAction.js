@@ -17,7 +17,7 @@ export const getCart = () => (dispatch, getState) => {
 
 export const addToCart = (id) => (dispatch, getState) => {
   axios
-    .post(URL + `/${id}`, tokenConfig(getState))
+    .post(URL + `/${id}`, {}, tokenConfig(getState))
     .then((res) => dispatch({ type: ADD_TO_CART, payload: res.data.product }))
     .catch((err) => console.log(err));
 };

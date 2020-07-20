@@ -16,7 +16,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 class App extends React.Component {
   componentDidMount() {
     document.body.style = "background: rgb(145, 145, 145, 0.6)";
-    // this.props.loadUser();
+    this.props.loadUser();
   }
 
   static propTypes = {

@@ -4,20 +4,19 @@ import { getCart } from "../../actions/cartAction";
 import CartItem from "./CartItem";
 import styles from "./Cart.module.css";
 import Loading from "../loading/Loading";
-// import { Redirect } from "react-router-dom";
+import { Redirect } from "react-router-dom";
 
 class Cart extends Component {
   componentDidMount() {
-    console.log(this.props);
     if (!this.props.userLoading) {
       this.props.getCart();
     }
   }
 
   render() {
-    // if (!this.props.isAuthenticaed) {
-    //   return <Redirect to="/" />;
-    // }
+    if (!this.props.isAuthenticaed) {
+      return <Redirect to="/" />;
+    }
     const items = this.props.products;
     let total = 0;
     items.forEach((item) => (total += item.price));

@@ -9,9 +9,11 @@ export const getCart = () => (dispatch, getState) => {
   dispatch({ type: CART_LOADING });
   axios
     .get(URL + "/display", tokenConfig(getState))
-    .then((res) =>
-      dispatch({ type: GET_CART, payload: res.data.cart.products })
-    )
+    .then((res) => {
+      if (res.data.cart.products) {
+        dispatch({ type: GET_CART, payload: res.data.cart.products });
+      }
+    })
     .catch((err) => console.log(err));
 };
 

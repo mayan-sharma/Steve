@@ -12,12 +12,14 @@ let URL = "/api/products";
 
 export const getProducts = () => (dispatch) => {
   dispatch({ type: PRODUCTS_LOADING });
-  axios.get(URL + "/").then((res) =>
-    dispatch({
-      type: GET_PRODUCTS,
-      payload: res.data,
-    })
-  );
+  axios.get(URL + "/").then((res) => {
+    if (res.data) {
+      dispatch({
+        type: GET_PRODUCTS,
+        payload: res.data,
+      });
+    }
+  });
 };
 
 export const getProduct = (id) => (dispatch) => {

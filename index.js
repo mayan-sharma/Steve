@@ -4,11 +4,15 @@ require("dotenv").config();
 const connectDb = require("./config/mongoose");
 const expressValidator = require("express-validator");
 const path = require("path");
+const cors = require('cors');
 
 const app = express();
 
 //connecting to database
 connectDb();
+
+// enable cors
+app.use(cors());
 
 //body parser
 app.use(bodyParser.json());

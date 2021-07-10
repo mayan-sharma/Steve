@@ -1,11 +1,17 @@
+const express = require("express");
+
 const Cart = require("../../models/cart");
 const Product = require("../../models/product");
-const express = require("express");
-const router = express.Router();
 const asyncHandler = require("../../middleware/error");
 const auth = require("../../middleware/auth");
 
-//route: /api/cart/:id POST
+const router = express.Router();
+
+/**
+ * @method POST
+ * @route /api/cart/:id
+ * @Authorization Bearer <Token>
+ */
 router.post("/:id", auth, async (req, res) => {
   try {
     const userId = req.user.id;
@@ -23,7 +29,11 @@ router.post("/:id", auth, async (req, res) => {
   }
 });
 
-//route: /api/cart/display POST
+/**
+ * @method GET
+ * @route /api/cart/display
+ * @Authorization Bearer <Token>
+ */
 router.get("/display", auth, async (req, res) => {
   const userId = req.user.id;
   try {
@@ -34,8 +44,11 @@ router.get("/display", auth, async (req, res) => {
   }
 });
 
-//route: /api/cart/id=123  DELETE
-//to remove one instance of that product
+/**
+ * @method DELETE
+ * @route /api/cart/:id
+ * @Authorization Bearer <Token>
+ */
 router.delete("/:id", auth, async (req, res) => {
   const userId = req.user.id;
   try {
@@ -55,8 +68,11 @@ router.delete("/:id", auth, async (req, res) => {
   }
 });
 
-// route: api/cart/deleteAll:id=123   DELETE
-//to delete all instances of that product
+/**
+ * @method DELETE
+ * @route /api/cart/deleteAll/:id
+ * @Authorization Bearer <Token>
+ */
 router.delete("/deleteAll/:id", auth, async (req, res) => {
   try {
     let cart = await Cart.findByIdAndUpdate(

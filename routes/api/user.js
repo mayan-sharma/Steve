@@ -1,21 +1,28 @@
-const  User  = require("../../models/user");
-const Cart = require("../../models/cart");
 const jwt = require("jsonwebtoken");
 const express = require("express");
 const bcrypt = require("bcrypt");
-const asyncHandler = require("../../middleware/error");
-const router = express.Router();
-const auth = require("../../middleware/auth");
-const validate = require("../../middleware/validate");
 const {check}  = require('express-validator');
 
-// route: api/user/login
+const User = require("../../models/user");
+const Cart = require("../../models/cart");
+const asyncHandler = require("../../middleware/error");
+const auth = require("../../middleware/auth");
+const admin = require('../../middleware/admin');
+const validate = require("../../middleware/validate");
+
+const router = express.Router();
+
+/**
+ * @method POST
+ * @route /api/user/login
+ * @Authorization None
+ */
 router.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ email: req.body.email });
     if (!user) {
       return res.status(400).json({
-        message: "Invalid username or password",
+        message: "Invalid email or password",
       });
     }
 
@@ -26,7 +33,7 @@ router.post("/login", async (req, res) => {
 
     if (!validPassword)
       return res.status(400).json({
-        message: "Invalid username or password",
+        message: "Invalid email or password",
       });
 
     const token = jwt.sign(
@@ -47,7 +54,11 @@ router.post("/login", async (req, res) => {
   }
 });
 
-//route: api/user/register
+/**
+ * @method POST
+ * @route /api/user/register
+ * @Authorization None
+ */
 router.post("/register", validate(
   [
     check('name', 'Name must have more than 3 characters').not().isEmpty().escape().isLength({min: 3}),
@@ -90,8 +101,12 @@ router.post("/register", validate(
   }
 });
 
-//route: api/user
-router.get("/", async (req, res) => {
+/**
+ * @method GET
+ * @route /api/user/
+ * @Authorization Admin
+ */
+router.get("/", [auth, admin], async (req, res) => {
   try {
     const users = await User.find({});
     res.status(200).json({
@@ -103,8 +118,12 @@ router.get("/", async (req, res) => {
   }
 });
 
-// route: api/user/verify
-router.get("/verify", auth, async (req, res) => {
+/**
+ * @method GET
+ * @route /api/user/verify
+ * @Authorization Bearer <Token>
+ */
+router.get("/verify", [auth, admin], async (req, res) => {
   try {
     res.status(200).json({ message: "User verified", user: req.user });
   } catch (err) {
@@ -112,8 +131,12 @@ router.get("/verify", auth, async (req, res) => {
   }
 });
 
-// route: /api/user/delete
-router.delete("/delete", auth, async(req, res)=>{
+/**
+ * @method DELETE
+ * @route /api/user/delete
+ * @Authorization Bearer <Token>
+ */
+router.delete("/delete", [auth, admin], async(req, res)=>{
   try{
     await Cart.findOneAndDelete({
       user: req.user.id

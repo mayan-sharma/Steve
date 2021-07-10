@@ -1,14 +1,19 @@
-const Product = require("../../models/product");
-const asyncHandler = require("../../middleware/error");
-const admin = require("../../middleware/admin");
-const auth = require("../../middleware/auth");
 const express = require("express");
-const router = express.Router();
-const validate = require("../../middleware/validate");
 const { check } = require("express-validator");
 
-// Get all Products
-// route: /api/products
+const Product = require("../../models/product");
+const admin = require("../../middleware/admin");
+const auth = require("../../middleware/auth");
+const validate = require("../../middleware/validate");
+const asyncHandler = require("../../middleware/error");
+
+const router = express.Router();
+
+/**
+ * @method GET
+ * @route /api/products/
+ * @Authorization None
+ */
 router.get("/", async (req, res) => {
   try {
     const products = await Product.find().sort("name");
@@ -18,8 +23,11 @@ router.get("/", async (req, res) => {
   }
 });
 
-// Get single product
-// route: /api/products/:id
+/**
+ * @method GET
+ * @route /api/products/:id
+ * @Authorization None
+ */
 router.get("/:id", async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
@@ -29,8 +37,11 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// POST product
-// route: /api/products
+/**
+ * @method POST
+ * @route /api/products
+ * @Authorization Bearer <Token>, Admin
+ */
 router.post(
   "/",
   [auth, admin],
@@ -57,8 +68,11 @@ router.post(
   }
 );
 
-// Update Product
-// route: /api/products/:id
+/**
+ * @method PUT
+ * @route /api/products/:id
+ * @Authorization Bearer <Token>, Admin
+ */
 router.put(
   "/:id",
   [auth, admin],
@@ -89,8 +103,11 @@ router.put(
   }
 );
 
-// Delete Product
-// route: /api/products/:id
+/**
+ * @method DELETE
+ * @route /api/products/:id
+ * @Authorization Bearer <Token>, Admin
+ */
 router.delete("/:id", [auth, admin], async (req, res) => {
   try {
     const product = await Product.findByIdAndRemove(req.params.id);

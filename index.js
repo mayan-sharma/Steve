@@ -1,10 +1,11 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 require("dotenv").config();
-const connectDb = require("./config/mongoose");
 const expressValidator = require("express-validator");
 const path = require("path");
 const cors = require('cors');
+
+const connectDb = require("./config/mongoose");
 
 const app = express();
 
